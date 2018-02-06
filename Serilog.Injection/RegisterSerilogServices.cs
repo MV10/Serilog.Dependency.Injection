@@ -14,14 +14,9 @@ namespace Serilog.Injection
                 .WriteTo.MSSqlServer(@"xxxxxxxxxxxxx", "Logs")
                 .CreateLogger();
 
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => CloseAndFlush();
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
 
             return services.AddSingleton(Log.Logger);
-        }
-
-        private static void CloseAndFlush()
-        {
-            Log.CloseAndFlush();
         }
     }
 }
