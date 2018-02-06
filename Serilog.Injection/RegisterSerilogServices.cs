@@ -5,18 +5,38 @@ namespace Serilog.Injection
 {
     public static class RegisterSerilogServices
     {
-        public static IServiceCollection AddSerilogServices(this IServiceCollection services)
+        /// <summary>
+        /// Register the Serilog service with a custom configuration.
+        /// </summary>
+        public static IServiceCollection AddSerilogServices(this IServiceCollection services, LoggerConfiguration configuration)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .Enrich.WithProperty("PropertyName", "PropertyValue")
-                .WriteTo.Console()
-                .WriteTo.MSSqlServer(@"xxxxxxxxxxxxx", "Logs")
-                .CreateLogger();
-
+            Log.Logger = configuration?.CreateLogger();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
-
             return services.AddSingleton(Log.Logger);
         }
+
+        /// <summary>
+        /// Register the Serilog service for SQL Service and console logging.
+        /// </summary>
+        public static IServiceCollection AddSerilogServices(this IServiceCollection services, string sqlConnectionString)
+        {
+            return services.AddSerilogServices(
+                new LoggerConfiguration()
+                    .MinimumLevel.Verbose()
+                    .WriteTo.Console()
+                    .WriteTo.MSSqlServer(sqlConnectionString, "Logs"));
+        }
+
+        /// <summary>
+        /// Register the Serilog service for console logging only.
+        /// </summary>
+        public static IServiceCollection AddSerilogServices(this IServiceCollection services)
+        {
+            return services.AddSerilogServices(
+                new LoggerConfiguration()
+                    .MinimumLevel.Verbose()
+                    .WriteTo.Console());
+        }
     }
+}
 }
