@@ -10,7 +10,7 @@ namespace Serilog.Injection
         /// </summary>
         public static IServiceCollection AddSerilogServices(this IServiceCollection services, LoggerConfiguration configuration)
         {
-            Log.Logger = configuration?.CreateLogger();
+            Log.Logger = configuration.CreateLogger();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => Log.CloseAndFlush();
             return services.AddSingleton(Log.Logger);
         }
